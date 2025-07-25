@@ -1,5 +1,51 @@
 #include "philo.h"
 
+long	get_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+void final_supper(t_data *data, t_philo *philo)
+{
+	(void)data;   // Suppress unused parameter warning
+	(void)philo;  // Suppress unused parameter warning
+	// TODO: Implement the main simulation logic here
+}
+
+void cleaner(t_data *data, t_philo *philo)
+{
+	int i;
+	
+	if (data)
+	{
+		if (data->forks)
+		{
+			i = 0;
+			while (i < data->philos)
+			{
+				pthread_mutex_destroy(&data->forks[i]);
+				i++;
+			}
+			free(data->forks);
+		}
+		free(data);
+	}
+	if (philo && data)  // Only clean philo if we have data to know the count
+	{
+		i = 0;
+		while (i < data->philos)
+		{
+			pthread_mutex_destroy(&philo[i].locker);
+			i++;
+		}
+		free(philo);
+	}
+	printf("cleaner\n");
+}
+
 t_philo	*philo_init(t_data *data)
 {
 	t_philo	*philo;
@@ -13,7 +59,8 @@ t_philo	*philo_init(t_data *data)
 	{
 		philo[i].id = i + 1;
 		philo[i].meals_count = 0;
-		philo[i].last_meal = 0;
+		philo[i].last_meal = data->start_timer; // Initialize with start time
+		philo[i].maxim_eaten = 0;  // Initialize boolean flag
 		philo[i].data = data;
 		philo[i].l_forks = &data->forks[i];
 		philo[i].r_forks = &data->forks[(i + 1) % data->philos];
@@ -23,17 +70,14 @@ t_philo	*philo_init(t_data *data)
 	return (philo);
 }
 
-int	ft_isdigit(char c)
-{
-	return (c >= '0' && c <= '9');
-}
-
 int	is_number(char *str)
 {
-	if (!str || *str == '\0')
+	if (!str || *str == '\0') 
 		return (0);
-	if (*str == '+' || *str == '-')
+	if (*str == '+')
 		str++;
+	if(*str == '-')
+		exit(EXIT_FAILURE);
 	while (*str)
 	{
 		if (!ft_isdigit(*str))
@@ -47,44 +91,71 @@ int	is_number(char *str)
 
 t_data *init_data(t_data *data, char **av)
 {
+	int i;
+	
 	data = malloc(sizeof(t_data));
-	data->ttd = ft_atoi(av[2]);
-	data->philos = ft_atoi(av[1]);
-	data->tte = ft_atoi(av[3]);
-	data->tts = ft_atoi(av[4]);
+	if (!data)
+		exit(EXIT_FAILURE);
+	data->ttd = ft_atoi(av[2]) * 1000;
+	data->philos = ft_atoi(av[1]); // how many philos 3ana
+	data->tte = ft_atoi(av[3]) * 1000; // same fo this too
+	data->tts = ft_atoi(av[4]) * 1000; // for the usleep function
 	if(av[5])
 		data->eat_counter = ft_atoi(av[5]);
+	else
+		data->eat_counter = -1; // No limit if not specified
 	data->rip = 0;
+	data->start_timer = get_time(); // Initialize start time
+	
+	// Initialize forks array
+	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos);
+	if (!data->forks)
+		exit(EXIT_FAILURE);
+	i = 0;
+	while (i < data->philos)
+	{
+		pthread_mutex_init(&data->forks[i], NULL);
+		i++;
+	}
+
 	return (data);
 }
 
 void valid_input(t_data *data, char **av, int ac)
 {
 	if((data->philos > 200 || data->tte > INT_MAX || data->tts > INT_MAX || data->ttd > INT_MAX))
+	{
+		cleaner(data, NULL);  // Pass NULL instead of uninitialized philo
 		exit(EXIT_FAILURE);
+	}
 	int i = 0;
 	while(i < ac)
 	{
 		if(!is_number(av[i]))
+		{
+			cleaner(data, NULL);  // Pass NULL instead of uninitialized philo
 			exit(EXIT_FAILURE);
+		}
 		i++;
 	}
-	printf("failed\n");
 }
 
 int main(int ac, char **av)
 {
-	t_data 	*data;
-	t_philo	*philo;
-	int i = 0;
+	t_data 	*data = NULL;  // Initialize to NULL
+	t_philo	*philo = NULL; // Initialize to NULL
+	
 	if(ac == 5 || ac == 6)
 	{
-		data = init_data(data ,av);
+		data = init_data(data ,av); // parse and init the data
 		if(data->philos < 1 || data->tte < 0 || data->tts < 0 || data->ttd < 0)
-			exit(EXIT_FAILURE); // zid cleaner
+		{
+			cleaner(data, philo);
+			exit(EXIT_FAILURE);
+		}
 		philo = philo_init(data);
-		valid_input(data,av, ac);
-		sim(data);
+		valid_input(data,av, ac);// validate the input
+		final_supper(data, philo);
 	}
 	else
 		exit(EXIT_FAILURE);

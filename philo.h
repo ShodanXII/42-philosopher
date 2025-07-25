@@ -2,6 +2,7 @@
 #define PHILO_H
 
 #include <unistd.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
@@ -12,21 +13,22 @@ typedef struct s_data t_data;
 
 struct s_data
 {
-	long	philos;
-	long	ttd;
-	long	tte;
-	long	tts;
-	int		rip;
-	long	start_timer;
-	long	eat_counter;
+	long			philos;
+	long			ttd;
+	long			tte;
+	long			tts;
+	char			rip;
+	long			start_timer;
+	long			eat_counter;
 	pthread_mutex_t	*forks;
 };
 
 struct s_philo
 {
 	int				id;
-	long			meals_count;
 	long			last_meal;
+	long			meals_count;
+	char			maxim_eaten;
 	t_data			*data;
 	pthread_t		thread;
 	pthread_mutex_t	*l_forks;
@@ -34,8 +36,9 @@ struct s_philo
 	pthread_mutex_t	locker;
 };
 
-
 int	is_number(char *str);
 int	ft_isdigit(char c);
+int	ft_atoi(const char *str);
+long	get_time(void);
 
 #endif
