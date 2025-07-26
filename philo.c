@@ -8,13 +8,6 @@ long	get_time(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void final_supper(t_data *data, t_philo *philo)
-{
-	(void)data;   // Suppress unused parameter warning
-	(void)philo;  // Suppress unused parameter warning
-	// TODO: Implement the main simulation logic here
-}
-
 void cleaner(t_data *data, t_philo *philo)
 {
 	int i;
@@ -31,6 +24,8 @@ void cleaner(t_data *data, t_philo *philo)
 			}
 			free(data->forks);
 		}
+		pthread_mutex_destroy(&data->ready_mutex);
+		pthread_cond_destroy(&data->ready_cond);
 		free(data);
 	}
 	if (philo && data)  // Only clean philo if we have data to know the count
@@ -105,7 +100,13 @@ t_data *init_data(t_data *data, char **av)
 	else
 		data->eat_counter = -1; // No limit if not specified
 	data->rip = 0;
+	data->all_threads_ready = 0;  // Boolean flag
+	data->ready_count = 0;        // Counter for ready threads
 	data->start_timer = get_time(); // Initialize start time
+	
+	// Initialize synchronization mutexes
+	pthread_mutex_init(&data->ready_mutex, NULL);
+	pthread_cond_init(&data->ready_cond, NULL);
 	
 	// Initialize forks array
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos);

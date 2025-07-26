@@ -20,7 +20,11 @@ struct s_data
 	char			rip;
 	long			start_timer;
 	long			eat_counter;
+	char			all_threads_ready;
+	long			ready_count;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	ready_mutex;
+	pthread_cond_t	ready_cond;
 };
 
 struct s_philo
@@ -29,6 +33,7 @@ struct s_philo
 	long			last_meal;
 	long			meals_count;
 	char			maxim_eaten;
+	char			threads_read;
 	t_data			*data;
 	pthread_t		thread;
 	pthread_mutex_t	*l_forks;
