@@ -22,9 +22,12 @@ struct s_data
 	long			eat_counter;
 	char			all_threads_ready;
 	long			ready_count;
+	long			philos_full_count; // Count of philosophers who finished eating
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	ready_mutex;
 	pthread_cond_t	ready_cond;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	full_count_mutex; // Protect the full count
 };
 
 struct s_philo
@@ -45,5 +48,7 @@ int	is_number(char *str);
 int	ft_isdigit(char c);
 int	ft_atoi(const char *str);
 long	get_time(void);
+void	cleaner(t_data *data, t_philo *philo);
+void	final_supper(t_data *data, t_philo *philo);
 
 #endif

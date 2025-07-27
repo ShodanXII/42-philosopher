@@ -26,6 +26,8 @@ void cleaner(t_data *data, t_philo *philo)
 		}
 		pthread_mutex_destroy(&data->ready_mutex);
 		pthread_cond_destroy(&data->ready_cond);
+		pthread_mutex_destroy(&data->print_mutex);
+		pthread_mutex_destroy(&data->full_count_mutex);
 		free(data);
 	}
 	if (philo && data)  // Only clean philo if we have data to know the count
@@ -91,10 +93,10 @@ t_data *init_data(t_data *data, char **av)
 	data = malloc(sizeof(t_data));
 	if (!data)
 		exit(EXIT_FAILURE);
-	data->ttd = ft_atoi(av[2]) * 1000;
+	data->ttd = ft_atoi(av[2]); // Keep in milliseconds
 	data->philos = ft_atoi(av[1]); // how many philos 3ana
-	data->tte = ft_atoi(av[3]) * 1000; // same fo this too
-	data->tts = ft_atoi(av[4]) * 1000; // for the usleep function
+	data->tte = ft_atoi(av[3]); // Keep in milliseconds  
+	data->tts = ft_atoi(av[4]); // Keep in milliseconds
 	if(av[5])
 		data->eat_counter = ft_atoi(av[5]);
 	else
@@ -102,11 +104,14 @@ t_data *init_data(t_data *data, char **av)
 	data->rip = 0;
 	data->all_threads_ready = 0;  // Boolean flag
 	data->ready_count = 0;        // Counter for ready threads
+	data->philos_full_count = 0;  // Count of full philosophers
 	data->start_timer = get_time(); // Initialize start time
 	
 	// Initialize synchronization mutexes
 	pthread_mutex_init(&data->ready_mutex, NULL);
 	pthread_cond_init(&data->ready_cond, NULL);
+	pthread_mutex_init(&data->print_mutex, NULL);
+	pthread_mutex_init(&data->full_count_mutex, NULL);
 	
 	// Initialize forks array
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos);
@@ -129,7 +134,7 @@ void valid_input(t_data *data, char **av, int ac)
 		cleaner(data, NULL);  // Pass NULL instead of uninitialized philo
 		exit(EXIT_FAILURE);
 	}
-	int i = 0;
+	int i = 1;  // Start from 1, not 0 (av[0] is program name)
 	while(i < ac)
 	{
 		if(!is_number(av[i]))
