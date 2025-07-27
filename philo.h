@@ -28,6 +28,7 @@ struct s_data
 	pthread_cond_t	ready_cond;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	full_count_mutex; // Protect the full count
+	pthread_mutex_t	rip_mutex; // Protect the rip flag
 };
 
 struct s_philo

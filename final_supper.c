@@ -28,18 +28,21 @@ void wait_for_all_threads(t_philo *philo)
 void print_action(t_philo *philo, char *action)
 {
 	long timestamp;
+	int should_print = 0;
 	
 	pthread_mutex_lock(&philo->data->print_mutex);
 	
 	// Check if simulation is still running
-	if (philo->data->rip)
-	{
-		pthread_mutex_unlock(&philo->data->print_mutex);
-		return;
-	}
+	pthread_mutex_lock(&philo->data->rip_mutex);
+	if (!philo->data->rip)
+		should_print = 1;
+	pthread_mutex_unlock(&philo->data->rip_mutex);
 	
-	timestamp = get_time() - philo->data->start_timer;
-	printf("%ld %d %s\n", timestamp, philo->id, action);
+	if (should_print)
+	{
+		timestamp = get_time() - philo->data->start_timer;
+		printf("%ld %d %s\n", timestamp, philo->id, action);
+	}
 	
 	pthread_mutex_unlock(&philo->data->print_mutex);
 }
@@ -107,13 +110,22 @@ void philo_eat(t_philo *philo)
 void *dinner(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
+	int simulation_running = 1;
 	
 	// Wait for all threads to be ready
 	wait_for_all_threads(philo);
 	
 	// Main simulation loop
-	while (!philo->data->rip && !philo->maxim_eaten)
+	while (simulation_running && !philo->maxim_eaten)
 	{
+		// Check if simulation is still running
+		pthread_mutex_lock(&philo->data->rip_mutex);
+		simulation_running = !philo->data->rip;
+		pthread_mutex_unlock(&philo->data->rip_mutex);
+		
+		if (!simulation_running || philo->maxim_eaten)
+			break;
+		
 		// Eat
 		philo_eat(philo);
 		
@@ -143,9 +155,18 @@ void *monitor_deaths(void *arg)
 	int i;
 	long current_time;
 	long time_since_last_meal;
+	int simulation_running = 1;
 	
-	while (!data->rip)
+	while (simulation_running)
 	{
+		// Check if simulation should continue
+		pthread_mutex_lock(&data->rip_mutex);
+		simulation_running = !data->rip;
+		pthread_mutex_unlock(&data->rip_mutex);
+		
+		if (!simulation_running)
+			break;
+			
 		// First check if all philosophers have eaten enough
 		if (data->eat_counter != -1)
 		{
@@ -156,7 +177,11 @@ void *monitor_deaths(void *arg)
 				pthread_mutex_lock(&data->print_mutex);
 				printf("reached final meal\n");
 				pthread_mutex_unlock(&data->print_mutex);
+				
+				pthread_mutex_lock(&data->rip_mutex);
 				data->rip = 1;
+				pthread_mutex_unlock(&data->rip_mutex);
+				
 				pthread_mutex_unlock(&data->full_count_mutex);
 				break;
 			}
@@ -167,8 +192,16 @@ void *monitor_deaths(void *arg)
 		current_time = get_time();
 		i = 0;
 		
-		while (i < data->philos && !data->rip)
+		while (i < data->philos)
 		{
+			// Check if simulation was stopped
+			pthread_mutex_lock(&data->rip_mutex);
+			simulation_running = !data->rip;
+			pthread_mutex_unlock(&data->rip_mutex);
+			
+			if (!simulation_running)
+				break;
+				
 			pthread_mutex_lock(&philos[i].locker);
 			time_since_last_meal = current_time - philos[i].last_meal;
 			pthread_mutex_unlock(&philos[i].locker);
@@ -177,11 +210,13 @@ void *monitor_deaths(void *arg)
 			if (time_since_last_meal > data->ttd)
 			{
 				pthread_mutex_lock(&data->print_mutex);
+				pthread_mutex_lock(&data->rip_mutex);
 				if (!data->rip)
 				{
 					printf("%ld %d died\n", current_time - data->start_timer, philos[i].id);
 					data->rip = 1;
 				}
+				pthread_mutex_unlock(&data->rip_mutex);
 				pthread_mutex_unlock(&data->print_mutex);
 				break;
 			}
@@ -243,7 +278,9 @@ void final_supper(t_data *data, t_philo *philo)
 	}
 	
 	// Stop monitor and wait for it
+	pthread_mutex_lock(&data->rip_mutex);
 	data->rip = 1;
+	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_join(monitor, NULL);
 }
 

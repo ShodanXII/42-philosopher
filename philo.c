@@ -112,6 +112,7 @@ t_data *init_data(t_data *data, char **av)
 	pthread_cond_init(&data->ready_cond, NULL);
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->full_count_mutex, NULL);
+	pthread_mutex_init(&data->rip_mutex, NULL);
 	
 	// Initialize forks array
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos);
