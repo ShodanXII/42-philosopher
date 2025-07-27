@@ -13,7 +13,7 @@ typedef struct s_data t_data;
 
 struct s_data
 {
-	long			philos;
+	long			philos_nb;
 	long			ttd;
 	long			tte;
 	long			tts;
@@ -29,6 +29,7 @@ struct s_data
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	full_count_mutex;
 	pthread_mutex_t	rip_mutex;
+	struct s_philo	*philos;
 };
 
 struct s_philo
@@ -61,5 +62,16 @@ void	init_mutexes(t_data *data);
 void	init_forks(t_data *data);
 void	valid_input(t_data *data, char **av, int ac);
 void	final_supper(t_data *data, t_philo *philo);
+int		print_error(char *err);
+void	print_state(t_data *data, int philo_id, char *state);
+void	ft_usleep(long duration, t_data *data);
+int		check_stop(t_philo *philo);
+void	pick_fork(t_philo *philo);
+void	eat(t_philo *philo);
+void	release_fork(t_philo *philo);
+void	sleep_philo(t_philo *philo);
+void	think(t_philo *philo);
+int		check_meals_complete(t_data *data);
+void	*single_routine(void *arg);
 
 #endif

@@ -15,13 +15,13 @@ void	cleaner(t_data *data, t_philo *philo)
 
 	philo_count = 0;
 	if (data)
-		philo_count = data->philos;
+		philo_count = data->philos_nb;
 	if (data)
 	{
 		if (data->forks)
 		{
 			i = 0;
-			while (i < data->philos)
+			while (i < data->philos_nb)
 			{
 				pthread_mutex_destroy(&data->forks[i]);
 				i++;
@@ -64,11 +64,11 @@ t_philo	*philo_init(t_data *data)
 	t_philo	*philo;
 	int		i;
 
-	philo = malloc(sizeof(t_philo) * data->philos);
+	philo = malloc(sizeof(t_philo) * data->philos_nb);
 	if (!philo)
 		exit(EXIT_FAILURE);
 	i = 0;
-	while (i < data->philos)
+	while (i < data->philos_nb)
 	{
 		init_single_philo(&philo[i], data, i);
 		i++;
@@ -89,7 +89,7 @@ void	init_single_philo(t_philo *philo, t_data *data, int i)
 
 void	assign_forks(t_philo *philo, t_data *data, int i)
 {
-	if (i == data->philos - 1)
+	if (i == data->philos_nb - 1)
 	{
 		philo->l_forks = &data->forks[0];
 		philo->r_forks = &data->forks[i];
@@ -97,7 +97,7 @@ void	assign_forks(t_philo *philo, t_data *data, int i)
 	else
 	{
 		philo->l_forks = &data->forks[i];
-		philo->r_forks = &data->forks[(i + 1) % data->philos];
+		philo->r_forks = &data->forks[(i + 1) % data->philos_nb];
 	}
 }
 
@@ -137,7 +137,7 @@ t_data	*init_data(t_data *data, char **av)
 void	parse_arguments(t_data *data, char **av)
 {
 	data->ttd = ft_atoi(av[2]);
-	data->philos = ft_atoi(av[1]);
+	data->philos_nb = ft_atoi(av[1]);
 	data->tte = ft_atoi(av[3]);
 	data->tts = ft_atoi(av[4]);
 	if (av[5])
@@ -159,11 +159,11 @@ void	init_forks(t_data *data)
 {
 	int	i;
 
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos);
+	data->forks = malloc(sizeof(pthread_mutex_t) * data->philos_nb);
 	if (!data->forks)
 		exit(EXIT_FAILURE);
 	i = 0;
-	while (i < data->philos)
+	while (i < data->philos_nb)
 	{
 		pthread_mutex_init(&data->forks[i], NULL);
 		i++;
@@ -174,7 +174,7 @@ void	valid_input(t_data *data, char **av, int ac)
 {
 	int	i;
 
-	if ((data->philos > 200 || data->tte > INT_MAX || data->tts > INT_MAX
+	if ((data->philos_nb > 200 || data->tte > INT_MAX || data->tts > INT_MAX
 			|| data->ttd > INT_MAX))
 	{
 		cleaner(data, NULL);
@@ -202,7 +202,7 @@ int	main(int ac, char **av)
 	if (ac == 5 || ac == 6)
 	{
 		data = init_data(data, av);
-		if (data->philos < 1 || data->tte < 0 || data->tts < 0
+		if (data->philos_nb < 1 || data->tte < 0 || data->tts < 0
 			|| data->ttd < 0)
 		{
 			cleaner(data, philo);

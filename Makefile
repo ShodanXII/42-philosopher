@@ -19,6 +19,8 @@ SRCS = philo.c \
        final_supper.c \
        ft_atoi.c \
        ft_isdigit.c \
+       utils.c \
+       actions.c \
 
 OBJS = $(SRCS:.c=.o)
 
