@@ -28,6 +28,7 @@ void cleaner(t_data *data, t_philo *philo)
 		pthread_cond_destroy(&data->ready_cond);
 		pthread_mutex_destroy(&data->print_mutex);
 		pthread_mutex_destroy(&data->full_count_mutex);
+		pthread_mutex_destroy(&data->rip_mutex);
 		free(data);
 	}
 	if (philo && data)  // Only clean philo if we have data to know the count
@@ -59,8 +60,22 @@ t_philo	*philo_init(t_data *data)
 		philo[i].last_meal = data->start_timer; // Initialize with start time
 		philo[i].maxim_eaten = 0;  // Initialize boolean flag
 		philo[i].data = data;
-		philo[i].l_forks = &data->forks[i];
-		philo[i].r_forks = &data->forks[(i + 1) % data->philos];
+		
+		// Fix fork allocation to prevent starvation
+		// Last philosopher takes forks in reverse order to break circular dependency
+		if (i == data->philos - 1)
+		{
+			// Last philosopher: right fork first, then left
+			philo[i].l_forks = &data->forks[0];  // First fork
+			philo[i].r_forks = &data->forks[i];  // Own fork
+		}
+		else
+		{
+			// All other philosophers: normal order
+			philo[i].l_forks = &data->forks[i];
+			philo[i].r_forks = &data->forks[(i + 1) % data->philos];
+		}
+		
 		pthread_mutex_init(&philo[i].locker, NULL);
 		i++;
 	}

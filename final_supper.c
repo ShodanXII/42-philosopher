@@ -50,24 +50,26 @@ void print_action(t_philo *philo, char *action)
 // Philosopher eating routine (fixed deadlock prevention)
 void philo_eat(t_philo *philo)
 {
-	// Deadlock prevention: lower ID philosopher takes left fork first
-	// higher ID philosopher takes right fork first
-	if (philo->id % 2 == 0)
+	pthread_mutex_t *first_fork, *second_fork;
+	
+	// Deadlock prevention: always acquire lower-numbered fork first
+	// This prevents circular wait condition
+	if (philo->l_forks < philo->r_forks)
 	{
-		// Even ID: take right fork first
-		pthread_mutex_lock(philo->r_forks);
-		print_action(philo, "has taken a fork");
-		pthread_mutex_lock(philo->l_forks);
-		print_action(philo, "has taken a fork");
+		first_fork = philo->l_forks;
+		second_fork = philo->r_forks;
 	}
 	else
 	{
-		// Odd ID: take left fork first
-		pthread_mutex_lock(philo->l_forks);
-		print_action(philo, "has taken a fork");
-		pthread_mutex_lock(philo->r_forks);
-		print_action(philo, "has taken a fork");
+		first_fork = philo->r_forks;
+		second_fork = philo->l_forks;
 	}
+	
+	// Acquire forks in order (lower address first)
+	pthread_mutex_lock(first_fork);
+	print_action(philo, "has taken a fork");
+	pthread_mutex_lock(second_fork);
+	print_action(philo, "has taken a fork");
 	
 	// Start eating
 	print_action(philo, "is eating");
@@ -93,17 +95,9 @@ void philo_eat(t_philo *philo)
 	// Sleep for eating time (convert milliseconds to microseconds for usleep)
 	usleep(philo->data->tte * 1000);
 	
-	// Release forks in reverse order
-	if (philo->id % 2 == 0)
-	{
-		pthread_mutex_unlock(philo->l_forks);
-		pthread_mutex_unlock(philo->r_forks);
-	}
-	else
-	{
-		pthread_mutex_unlock(philo->r_forks);
-		pthread_mutex_unlock(philo->l_forks);
-	}
+	// Release forks in reverse order of acquisition
+	pthread_mutex_unlock(second_fork);
+	pthread_mutex_unlock(first_fork);
 }
 
 // Main philosopher routine
@@ -114,6 +108,11 @@ void *dinner(void *arg)
 	
 	// Wait for all threads to be ready
 	wait_for_all_threads(philo);
+	
+	// Staggered start to reduce initial competition
+	// Even philosophers start immediately, odd philosophers wait slightly
+	if (philo->id % 2 == 0)
+		usleep(50 * 1000); // 50ms delay for even philosophers
 	
 	// Main simulation loop
 	while (simulation_running && !philo->maxim_eaten)
