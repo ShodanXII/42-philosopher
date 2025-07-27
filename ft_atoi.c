@@ -25,7 +25,7 @@ int	ft_atoi(const char *str)
 		i++;
 	if (str[i] == '-')
 		exit(EXIT_FAILURE);
-	if (!ft_isdigit(str[i]))  // Fixed: should be NOT digit
+	if (!ft_isdigit(str[i]))
 		exit(EXIT_FAILURE);
 	while (str[i] && str[i] >= 48 && str[i] <= 57)
 	{

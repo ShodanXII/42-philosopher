@@ -22,13 +22,13 @@ struct s_data
 	long			eat_counter;
 	char			all_threads_ready;
 	long			ready_count;
-	long			philos_full_count; // Count of philosophers who finished eating
+	long			philos_full_count;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	ready_mutex;
 	pthread_cond_t	ready_cond;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	full_count_mutex; // Protect the full count
-	pthread_mutex_t	rip_mutex; // Protect the rip flag
+	pthread_mutex_t	full_count_mutex;
+	pthread_mutex_t	rip_mutex;
 };
 
 struct s_philo
@@ -45,11 +45,21 @@ struct s_philo
 	pthread_mutex_t	locker;
 };
 
-int	is_number(char *str);
-int	ft_isdigit(char c);
-int	ft_atoi(const char *str);
+int		is_number(char *str);
+int		ft_isdigit(char c);
+int		ft_atoi(const char *str);
 long	get_time(void);
 void	cleaner(t_data *data, t_philo *philo);
+void	clean_mutexes(t_data *data);
+void	clean_philos(t_philo *philo, int philo_count);
+t_philo	*philo_init(t_data *data);
+void	init_single_philo(t_philo *philo, t_data *data, int i);
+void	assign_forks(t_philo *philo, t_data *data, int i);
+t_data	*init_data(t_data *data, char **av);
+void	parse_arguments(t_data *data, char **av);
+void	init_mutexes(t_data *data);
+void	init_forks(t_data *data);
+void	valid_input(t_data *data, char **av, int ac);
 void	final_supper(t_data *data, t_philo *philo);
 
 #endif
