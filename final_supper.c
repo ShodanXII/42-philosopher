@@ -3,23 +3,14 @@
 int	check_meals_complete(t_data *data)
 {
 	int	completed_meals;
-	int	i;
 
-	completed_meals = 1;
 	if (data->eat_counter <= 0)
 		return (0);
+	
 	pthread_mutex_lock(&data->full_count_mutex);
-	i = 0;
-	while (i < data->philos_nb)
-	{
-		if (data->philos_full_count < data->philos_nb)
-		{
-			completed_meals = 0;
-			break ;
-		}
-		i++;
-	}
+	completed_meals = (data->philos_full_count >= data->philos_nb);
 	pthread_mutex_unlock(&data->full_count_mutex);
+	
 	if (completed_meals)
 	{
 		pthread_mutex_lock(&data->rip_mutex);
@@ -42,9 +33,9 @@ void	*single_routine(void *arg)
 	return (NULL);
 }
 
-void	*routine(void *arg)
+void *routine(void *arg)
 {
-	t_philo	*philo;
+	t_philo *philo;
 
 	philo = (t_philo *)arg;
 	pthread_mutex_lock(&philo->locker);
@@ -52,25 +43,30 @@ void	*routine(void *arg)
 	pthread_mutex_unlock(&philo->locker);
 	think(philo);
 	if (philo->id % 2 == 1)
-		usleep((philo->data->tte / 2) * 1000);
+		usleep(philo->data->tte * 1000);
 	while (1)
 	{
 		if (check_stop(philo))
 			return (NULL);
 		pick_fork(philo);
 		eat(philo);
+		pthread_mutex_lock(&philo->locker);
 		if (philo->data->eat_counter != -1 && 
 			philo->meals_count >= philo->data->eat_counter &&
 			!philo->maxim_eaten)
 		{
-			pthread_mutex_lock(&philo->locker);
 			philo->maxim_eaten = 1;
 			pthread_mutex_unlock(&philo->locker);
+			
 			pthread_mutex_lock(&philo->data->full_count_mutex);
 			philo->data->philos_full_count++;
 			pthread_mutex_unlock(&philo->data->full_count_mutex);
 		}
+		else
+			pthread_mutex_unlock(&philo->locker);
 		release_fork(philo);
+		if (philo->data->philos_nb > 2)
+			usleep(1000);			
 		sleep_philo(philo);
 		think(philo);
 	}

@@ -89,15 +89,18 @@ void	init_single_philo(t_philo *philo, t_data *data, int i)
 
 void	assign_forks(t_philo *philo, t_data *data, int i)
 {
-	if (i == data->philos_nb - 1)
+	int left = i;
+	int right = (i + 1) % data->philos_nb;
+	
+	if (left < right)
 	{
-		philo->l_forks = &data->forks[0];
-		philo->r_forks = &data->forks[i];
-	}
-	else
+		philo->l_forks = &data->forks[left];
+		philo->r_forks = &data->forks[right];
+	} 
+	else 
 	{
-		philo->l_forks = &data->forks[i];
-		philo->r_forks = &data->forks[(i + 1) % data->philos_nb];
+		philo->l_forks = &data->forks[right];
+		philo->r_forks = &data->forks[left];
 	}
 }
 
