@@ -6,11 +6,9 @@ int	check_meals_complete(t_data *data)
 
 	if (data->eat_counter <= 0)
 		return (0);
-	
 	pthread_mutex_lock(&data->full_count_mutex);
 	completed_meals = (data->philos_full_count >= data->philos_nb);
 	pthread_mutex_unlock(&data->full_count_mutex);
-	
 	if (completed_meals)
 	{
 		pthread_mutex_lock(&data->rip_mutex);

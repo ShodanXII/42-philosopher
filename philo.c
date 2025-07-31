@@ -37,7 +37,6 @@ void	cleaner(t_data *data, t_philo *philo)
 void	clean_mutexes(t_data *data)
 {
 	pthread_mutex_destroy(&data->ready_mutex);
-	pthread_cond_destroy(&data->ready_cond);
 	pthread_mutex_destroy(&data->print_mutex);
 	pthread_mutex_destroy(&data->full_count_mutex);
 	pthread_mutex_destroy(&data->rip_mutex);
@@ -129,7 +128,6 @@ t_data	*init_data(t_data *data, char **av)
 	parse_arguments(data, av);
 	data->rip = 0;
 	data->all_threads_ready = 0;
-	data->ready_count = 0;
 	data->philos_full_count = 0;
 	data->start_timer = get_time();
 	init_mutexes(data);
@@ -152,7 +150,6 @@ void	parse_arguments(t_data *data, char **av)
 void	init_mutexes(t_data *data)
 {
 	pthread_mutex_init(&data->ready_mutex, NULL);
-	pthread_cond_init(&data->ready_cond, NULL);
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->full_count_mutex, NULL);
 	pthread_mutex_init(&data->rip_mutex, NULL);

@@ -21,11 +21,9 @@ struct s_data
 	long			start_timer;
 	long			eat_counter;
 	char			all_threads_ready;
-	long			ready_count;
 	long			philos_full_count;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	ready_mutex;
-	pthread_cond_t	ready_cond;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	full_count_mutex;
 	pthread_mutex_t	rip_mutex;
