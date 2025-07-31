@@ -127,7 +127,6 @@ t_data	*init_data(t_data *data, char **av)
 		exit(EXIT_FAILURE);
 	parse_arguments(data, av);
 	data->rip = 0;
-	data->all_threads_ready = 0;
 	data->philos_full_count = 0;
 	data->start_timer = get_time();
 	init_mutexes(data);

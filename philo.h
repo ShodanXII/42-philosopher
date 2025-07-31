@@ -20,7 +20,6 @@ struct s_data
 	char			rip;
 	long			start_timer;
 	long			eat_counter;
-	char			all_threads_ready;
 	long			philos_full_count;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	ready_mutex;

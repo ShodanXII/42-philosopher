@@ -36,16 +36,14 @@ void *routine(void *arg)
 	t_philo *philo;
 
 	philo = (t_philo *)arg;
-	pthread_mutex_lock(&philo->locker);
 	philo->last_meal = get_time();
-	pthread_mutex_unlock(&philo->locker);
-	think(philo);
 	if (philo->id % 2 == 1)
-		usleep(philo->data->tte * 1000);
+        sleep_philo(philo);
 	while (1)
 	{
 		if (check_stop(philo))
 			return (NULL);
+	    think(philo);
 		pick_fork(philo);
 		eat(philo);
 		pthread_mutex_lock(&philo->locker);
@@ -78,7 +76,7 @@ int	check_philosopher_death(t_philo *philo, t_data *data)
 	pthread_mutex_lock(&philo->locker);
 	time_since_last_meal = get_time() - philo->last_meal;
 	pthread_mutex_unlock(&philo->locker);
-	if (time_since_last_meal >= data->ttd)
+	if (time_since_last_meal > data->ttd)
 	{
 		pthread_mutex_lock(&data->rip_mutex);
 		if (!data->rip)
@@ -110,7 +108,7 @@ void	*monitor_deaths(void *arg)
 			if (check_philosopher_death(&data->philos[i], data))
 				return (NULL);
 			i++;
-			usleep(100);
+			// usleep(100);
 		}
 	}
 	return (NULL);
@@ -130,13 +128,10 @@ void final_supper(t_data *data, t_philo *philo)
 		pthread_join(philo[0].thread, NULL);
 		return;
 	}
-	
 	data->start_timer = get_time();
 	data->philos = philo;
-	
 	if (pthread_create(&monitor, NULL, monitor_deaths, data))
 		return ;
-	
 	i = 0;
 	while (i < data->philos_nb)
 	{
@@ -144,14 +139,12 @@ void final_supper(t_data *data, t_philo *philo)
 			return ;
 		i++;
 	}
-	
 	i = 0;
 	while (i < data->philos_nb)
 	{
 		pthread_join(philo[i].thread, NULL);
 		i++;
-	}
-	
+	}	
 	pthread_mutex_lock(&data->rip_mutex);
 	data->rip = 1;
 	pthread_mutex_unlock(&data->rip_mutex);
