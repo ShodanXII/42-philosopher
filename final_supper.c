@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   final_supper.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/31 20:39:55 by achat             #+#    #+#             */
+/*   Updated: 2025/07/31 20:39:56 by achat            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	check_meals_complete(t_data *data)
@@ -76,7 +88,7 @@ int	check_philosopher_death(t_philo *philo, t_data *data)
 	pthread_mutex_lock(&philo->locker);
 	time_since_last_meal = get_time() - philo->last_meal;
 	pthread_mutex_unlock(&philo->locker);
-	if (time_since_last_meal > data->ttd)
+	if (time_since_last_meal >= data->ttd)
 	{
 		pthread_mutex_lock(&data->rip_mutex);
 		if (!data->rip)
