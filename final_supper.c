@@ -48,7 +48,31 @@ void	*philosopher_lifecycle(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	philo->last_meal = current_timestamp();
+	
+	// Signal that this thread is ready
+	pthread_mutex_lock(&philo->data->sync_mutex);
+	philo->data->threads_ready++;
+	if (philo->data->threads_ready == philo->data->philos_nb)
+	{
+		// Last thread to start - set synchronized start time
+		philo->data->sync_start_time = current_timestamp();
+	}
+	pthread_mutex_unlock(&philo->data->sync_mutex);
+	
+	// Wait for all threads to be ready
+	while (1)
+	{
+		pthread_mutex_lock(&philo->data->sync_mutex);
+		if (philo->data->sync_start_time != 0)
+		{
+			philo->last_meal = philo->data->sync_start_time;
+			pthread_mutex_unlock(&philo->data->sync_mutex);
+			break;
+		}
+		pthread_mutex_unlock(&philo->data->sync_mutex);
+		usleep(10);
+	}
+	
 	if (philo->id % 2 == 1)
 		rest_philosopher(philo);
 	while (1)
@@ -138,10 +162,7 @@ void	final_supper(t_data *data, t_philo *philo)
 		pthread_join(philo[0].thread, NULL);
 		return ;
 	}
-	data->start_timer = current_timestamp();
 	data->philos = philo;
-	if (pthread_create(&monitor, NULL, observe_philosophers, data))
-		return ;
 	i = 0;
 	while (i < data->philos_nb)
 	{
@@ -149,6 +170,28 @@ void	final_supper(t_data *data, t_philo *philo)
 			return ;
 		i++;
 	}
+	
+	// Wait for all threads to synchronize, then set the global start timer
+	while (1)
+	{
+		pthread_mutex_lock(&data->sync_mutex);
+		if (data->sync_start_time != 0)
+		{
+			data->start_timer = data->sync_start_time;
+			pthread_mutex_unlock(&data->sync_mutex);
+			break;
+		}
+		pthread_mutex_unlock(&data->sync_mutex);
+		usleep(10);
+	}
+	
+	// Small delay to ensure all philosophers have started their lifecycle
+	usleep(1000);
+	
+	// Now start the monitor thread after synchronization is complete
+	if (pthread_create(&monitor, NULL, observe_philosophers, data))
+		return ;
+	
 	i = 0;
 	while (i < data->philos_nb)
 	{

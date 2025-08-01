@@ -33,8 +33,11 @@ struct s_data
 	long			start_timer;
 	long			eat_counter;
 	long			philos_full_count;
+	long			threads_ready;
+	long			sync_start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	ready_mutex;
+	pthread_mutex_t	sync_mutex;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	full_count_mutex;
 	pthread_mutex_t	rip_mutex;

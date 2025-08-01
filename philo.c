@@ -49,6 +49,7 @@ void	cleanup_resources(t_data *data, t_philo *philo)
 void	destroy_mutexes(t_data *data)
 {
 	pthread_mutex_destroy(&data->ready_mutex);
+	pthread_mutex_destroy(&data->sync_mutex);
 	pthread_mutex_destroy(&data->print_mutex);
 	pthread_mutex_destroy(&data->full_count_mutex);
 	pthread_mutex_destroy(&data->rip_mutex);
@@ -91,7 +92,7 @@ void	setup_philosopher(t_philo *philo, t_data *data, int i)
 {
 	philo->id = i + 1;
 	philo->meals_count = 0;
-	philo->last_meal = data->start_timer;
+	philo->last_meal = 0;
 	philo->maxim_eaten = 0;
 	philo->data = data;
 	distribute_utensils(philo, data, i);
@@ -142,6 +143,8 @@ t_data	*setup_simulation(t_data *data, char **av)
 	process_parameters(data, av);
 	data->rip = 0;
 	data->philos_full_count = 0;
+	data->threads_ready = 0;
+	data->sync_start_time = 0;
 	data->start_timer = current_timestamp();
 	create_mutexes(data);
 	prepare_utensils(data);
@@ -163,6 +166,7 @@ void	process_parameters(t_data *data, char **av)
 void	create_mutexes(t_data *data)
 {
 	pthread_mutex_init(&data->ready_mutex, NULL);
+	pthread_mutex_init(&data->sync_mutex, NULL);
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->full_count_mutex, NULL);
 	pthread_mutex_init(&data->rip_mutex, NULL);
