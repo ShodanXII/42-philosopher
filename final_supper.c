@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:39:55 by achat             #+#    #+#             */
-/*   Updated: 2025/07/31 20:39:56 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/01 17:10:12 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,6 @@ void	*philosopher_lifecycle(void *arg)
 		else
 			pthread_mutex_unlock(&philo->locker);
 		drop_utensils(philo);
-		if (philo->data->philos_nb > 2)
-			usleep(1000);
 		rest_philosopher(philo);
 		contemplate(philo);
 	}
