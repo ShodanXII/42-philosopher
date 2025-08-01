@@ -185,6 +185,9 @@ void	final_supper(t_data *data, t_philo *philo)
 		usleep(10);
 	}
 	
+	// Small delay to ensure all philosophers have started their lifecycle
+	usleep(1000);
+	
 	// Now start the monitor thread after synchronization is complete
 	if (pthread_create(&monitor, NULL, observe_philosophers, data))
 		return ;
