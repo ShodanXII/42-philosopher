@@ -12,29 +12,29 @@
 
 #include "philo.h"
 
-int	print_error(char *err)
+int	display_error(char *err)
 {
 	printf("%s\n", err);
 	return (0);
 }
 
-void	print_state(t_data *data, int philo_id, char *state)
+void	announce_action(t_data *data, int philo_id, char *state)
 {
 	long	timestamp;
 
 	pthread_mutex_lock(&data->print_mutex);
-	timestamp = get_time() - data->start_timer;
+	timestamp = current_timestamp() - data->start_timer;
 	if (!data->rip)
 		printf("%-4ld %-3d %s\n", timestamp, philo_id, state);
 	pthread_mutex_unlock(&data->print_mutex);
 }
 
-void	ft_usleep(long duration, t_data *data)
+void	precise_sleep(long duration, t_data *data)
 {
 	long	start;
 
-	start = get_time();
-	while (get_time() - start < duration)
+	start = current_timestamp();
+	while (current_timestamp() - start < duration)
 	{
 		usleep(100);
 		pthread_mutex_lock(&data->rip_mutex);
@@ -47,7 +47,7 @@ void	ft_usleep(long duration, t_data *data)
 	}
 }
 
-int	check_stop(t_philo *philo)
+int	should_terminate(t_philo *philo)
 {
 	int	stop;
 

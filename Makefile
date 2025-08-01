@@ -1,3 +1,5 @@
+NAME = philo
+
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
@@ -6,7 +8,7 @@ SRCS = philo.c \
        ft_atoi.c \
        ft_isdigit.c \
        utils.c \
-       actions.c \
+       actions.c
 
 OBJS = $(SRCS:.c=.o)
 

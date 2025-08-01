@@ -12,47 +12,47 @@
 
 #include "philo.h"
 
-void	pick_fork(t_philo *philo)
+void	acquire_utensils(t_philo *philo)
 {
 	if (philo->data->philos_nb == 2 && philo->id == 2)
 		usleep(100);
 	pthread_mutex_lock(philo->l_forks);
-	print_state(philo->data, philo->id, "has taken a fork");
-	if (check_stop(philo))
+	announce_action(philo->data, philo->id, "has taken a fork");
+	if (should_terminate(philo))
 	{
 		pthread_mutex_unlock(philo->l_forks);
 		return;
 	}
 	pthread_mutex_lock(philo->r_forks);
-	print_state(philo->data, philo->id, "has taken a fork");
+	announce_action(philo->data, philo->id, "has taken a fork");
 }
 
-void	eat(t_philo *philo)
+void	consume_meal(t_philo *philo)
 {
-	long eat_start_time;
+	long	eat_start_time;
 
-	eat_start_time = get_time();
+	eat_start_time = current_timestamp();
 	pthread_mutex_lock(&philo->locker);
 	philo->last_meal = eat_start_time;
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->locker);
-	print_state(philo->data, philo->id, "is eating");
-	ft_usleep(philo->data->tte, philo->data);
+	announce_action(philo->data, philo->id, "is eating");
+	precise_sleep(philo->data->tte, philo->data);
 }
 
-void	release_fork(t_philo *philo)
+void	drop_utensils(t_philo *philo)
 {
 	pthread_mutex_unlock(philo->l_forks);
 	pthread_mutex_unlock(philo->r_forks);
 }
 
-void	sleep_philo(t_philo *philo)
+void	rest_philosopher(t_philo *philo)
 {
-	print_state(philo->data, philo->id, "is sleeping");
-	ft_usleep(philo->data->tts, philo->data);
+	announce_action(philo->data, philo->id, "is sleeping");
+	precise_sleep(philo->data->tts, philo->data);
 }
 
-void	think(t_philo *philo)
+void	contemplate(t_philo *philo)
 {
-	print_state(philo->data, philo->id, "is thinking");
+	announce_action(philo->data, philo->id, "is thinking");
 }
