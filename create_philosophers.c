@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 21:12:48 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 21:24:06 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 21:33:46 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ t_philo	*create_philosophers(t_data *data)
 
 	philo = allocate_philosophers(data);
 	if (!philo)
-		return (NULL);	
+		return (NULL);
 	i = 0;
 	while (i < data->philos_nb)
 	{

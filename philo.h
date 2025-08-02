@@ -11,17 +11,17 @@
 /* ************************************************************************** */
 
 #ifndef PHILO_H
-#define PHILO_H
+# define PHILO_H
 
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <limits.h>
+# include <unistd.h>
+# include <sys/time.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <pthread.h>
+# include <limits.h>
 
-typedef struct s_philo t_philo;
-typedef struct s_data t_data;
+typedef struct s_philo	t_philo;
+typedef struct s_data	t_data;
 
 struct s_data
 {
