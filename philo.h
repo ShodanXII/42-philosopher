@@ -34,7 +34,6 @@ struct s_data
 	long			eat_counter;
 	long			philos_full_count;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	ready_mutex;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	full_count_mutex;
 	pthread_mutex_t	rip_mutex;
@@ -65,7 +64,7 @@ void	free_philosophers(t_philo *philo, int philo_count);
 t_philo	*create_philosophers(t_data *data);
 void	setup_philosopher(t_philo *philo, t_data *data, int i);
 void	distribute_utensils(t_philo *philo, t_data *data, int i);
-t_data	*setup_simulation(t_data *data, char **av);
+t_data	*init_data(t_data *data, char **av);
 void	process_parameters(t_data *data, char **av);
 void	create_mutexes(t_data *data);
 void	prepare_utensils(t_data *data);
@@ -78,9 +77,14 @@ int		should_terminate(t_philo *philo);
 void	acquire_utensils(t_philo *philo);
 void	consume_meal(t_philo *philo);
 void	drop_utensils(t_philo *philo);
+void	one_philo(t_philo *philo);
+void	*philosopher_lifecycle(void *arg);
+void	*observe_philosophers(void *arg);
 void	rest_philosopher(t_philo *philo);
+int		detect_starvation(t_philo *philo, t_data *data);
 void	contemplate(t_philo *philo);
 int		verify_all_fed(t_data *data);
+void	create_mutexes(t_data *data);
 void	*lonely_philosopher_routine(void *arg);
 
 #endif

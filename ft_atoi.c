@@ -24,9 +24,11 @@ int	ft_atoi(const char *str)
 	while (ft_isspace(str[i]))
 		i++;
 	if (str[i] == '-')
-		exit(EXIT_FAILURE);
+		return (-1);
+	if (str[i] == '+')
+		i++;
 	if (!ft_isdigit(str[i]))
-		exit(EXIT_FAILURE);
+		return (-1);
 	while (str[i] && str[i] >= 48 && str[i] <= 57)
 	{
 		result *= 10;

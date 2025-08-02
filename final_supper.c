@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:39:55 by achat             #+#    #+#             */
-/*   Updated: 2025/08/01 17:10:12 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 19:56:24 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,110 +43,36 @@ void	*lonely_philosopher_routine(void *arg)
 	return (NULL);
 }
 
-void	*philosopher_lifecycle(void *arg)
+static int	start_simulation(t_data *data, t_philo *philo, pthread_t *monitor)
 {
-	t_philo	*philo;
+	int	i;
 
-	philo = (t_philo *)arg;
-	philo->last_meal = current_timestamp();
-	if (philo->id % 2 == 1)
-		rest_philosopher(philo);
-	while (1)
+	if (data->eat_counter == 0)
+		return (0);
+	if (data->philos_nb == 1)
 	{
-		if (should_terminate(philo))
-			return (NULL);
-		contemplate(philo);
-		acquire_utensils(philo);
-		consume_meal(philo);
-		pthread_mutex_lock(&philo->locker);
-		if (philo->data->eat_counter != -1
-			&& philo->meals_count >= philo->data->eat_counter
-			&& !philo->maxim_eaten)
-		{
-			philo->maxim_eaten = 1;
-			pthread_mutex_unlock(&philo->locker);
-			pthread_mutex_lock(&philo->data->full_count_mutex);
-			philo->data->philos_full_count++;
-			pthread_mutex_unlock(&philo->data->full_count_mutex);
-		}
-		else
-			pthread_mutex_unlock(&philo->locker);
-		drop_utensils(philo);
-		rest_philosopher(philo);
-		contemplate(philo);
+		one_philo(philo);
+		return (0);
 	}
-	return (NULL);
-}
-
-int	detect_starvation(t_philo *philo, t_data *data)
-{
-	long	time_since_last_meal;
-
-	pthread_mutex_lock(&philo->locker);
-	time_since_last_meal = current_timestamp() - philo->last_meal;
-	pthread_mutex_unlock(&philo->locker);
-	if (time_since_last_meal >= data->ttd)
-	{
-		pthread_mutex_lock(&data->rip_mutex);
-		if (!data->rip)
-		{
-			announce_action(data, philo->id, "died");
-			data->rip = 1;
-			pthread_mutex_unlock(&data->rip_mutex);
-			return (1);
-		}
-		pthread_mutex_unlock(&data->rip_mutex);
+	data->start_timer = current_timestamp();
+	data->philos = philo;
+	if (pthread_create(monitor, NULL, observe_philosophers, data))
 		return (1);
+	i = 0;
+	while (i < data->philos_nb)
+	{
+		if (pthread_create(&philo[i].thread, NULL, 
+				philosopher_lifecycle, &philo[i]))
+			return (1);
+		i++;
 	}
 	return (0);
 }
 
-void	*observe_philosophers(void *arg)
+static void	wait_and_cleanup(t_data *data, t_philo *philo, pthread_t monitor)
 {
-	t_data	*data;
-	int		i;
+	int	i;
 
-	data = (t_data *)arg;
-	while (!data->rip)
-	{
-		if (verify_all_fed(data))
-			return (NULL);
-		i = 0;
-		while (i < data->philos_nb)
-		{
-			if (detect_starvation(&data->philos[i], data))
-				return (NULL);
-			i++;
-		}
-	}
-	return (NULL);
-}
-
-void	final_supper(t_data *data, t_philo *philo)
-{
-	int			i;
-	pthread_t	monitor;
-
-	if (data->eat_counter == 0)
-		return ;
-	if (data->philos_nb == 1)
-	{
-		if (pthread_create(&philo[0].thread, NULL, lonely_philosopher_routine, &philo[0]))
-			return ;
-		pthread_join(philo[0].thread, NULL);
-		return ;
-	}
-	data->start_timer = current_timestamp();
-	data->philos = philo;
-	if (pthread_create(&monitor, NULL, observe_philosophers, data))
-		return ;
-	i = 0;
-	while (i < data->philos_nb)
-	{
-		if (pthread_create(&philo[i].thread, NULL, philosopher_lifecycle, &philo[i]))
-			return ;
-		i++;
-	}
 	i = 0;
 	while (i < data->philos_nb)
 	{
@@ -157,4 +83,12 @@ void	final_supper(t_data *data, t_philo *philo)
 	data->rip = 1;
 	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_join(monitor, NULL);
+}
+
+void	final_supper(t_data *data, t_philo *philo)
+{
+	pthread_t	monitor;
+
+	if (start_simulation(data, philo, &monitor) == 0)
+		wait_and_cleanup(data, philo, monitor);
 }

@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by abde-nnour        #+#    #+#             */
-/*   Updated: 2025/07/31 15:42:40 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 19:45:18 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	acquire_utensils(t_philo *philo)
 	if (should_terminate(philo))
 	{
 		pthread_mutex_unlock(philo->l_forks);
-		return;
+		return ;
 	}
 	pthread_mutex_lock(philo->r_forks);
 	announce_action(philo->data, philo->id, "has taken a fork");
