@@ -29,13 +29,13 @@ int	ft_atoi(const char *str)
 		i++;
 	if (!ft_isdigit(str[i]))
 		return (-1);
-	while (str[i] && str[i] >= 48 && str[i] <= 57)
+	while (str[i] && str[i] >= '0' && str[i] <= '9')
 	{
 		result *= 10;
-		result += str[i] - 48;
+		result += str[i] - '0';
 		i++;
 	}
-	if (str[i] && (str[i] == '-' || str[i] == '+'))
+	if (str[i] != '\0')
 		return (-1);
 	return (result);
 }

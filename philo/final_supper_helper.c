@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 19:47:44 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 21:50:54 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 22:52:11 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,17 @@ void	*philosopher_lifecycle(void *arg)
 int	detect_starvation(t_philo *philo, t_data *data)
 {
 	long	time_since_last_meal;
+	int		should_die;
 
+	should_die = 0;
+	time_since_last_meal = 0;
 	pthread_mutex_lock(&philo->locker);
 	time_since_last_meal = current_timestamp() - philo->last_meal;
-	pthread_mutex_unlock(&philo->locker);
 	if (time_since_last_meal >= data->ttd)
+		should_die = 1;
+	pthread_mutex_unlock(&philo->locker);
+
+	if (should_die)
 	{
 		pthread_mutex_lock(&data->rip_mutex);
 		if (!data->rip)
@@ -77,7 +83,6 @@ int	detect_starvation(t_philo *philo, t_data *data)
 			return (1);
 		}
 		pthread_mutex_unlock(&data->rip_mutex);
-		return (1);
 	}
 	return (0);
 }

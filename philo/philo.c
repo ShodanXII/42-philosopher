@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:40:13 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 21:25:51 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 22:46:14 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,24 +70,26 @@ int	main(int ac, char **av)
 {
 	t_data	*data;
 	t_philo	*philo;
+	int		i;
 
-	data = NULL;
-	philo = NULL;
-	if (ac == 5 || ac == 6)
-	{
-		data = init_data(data, av);
-		if (data->philos_nb < 1 || data->tte < 0 || data->tts < 0
-			|| data->ttd < 0)
-		{
-			cleanup_resources(data, philo);
-			return (1);
-		}
-		philo = create_philosophers(data);
-		validate_arguments(data, av, ac);
-		final_supper(data, philo);
-		cleanup_resources(data, philo);
-	}
-	else
+	if (ac != 5 && ac != 6)
 		return (1);
+	i = 1;
+	while (i < ac)
+	{
+		if (!validate_numeric(av[i]))
+			return (1);
+		i++;
+	}
+	data = init_data(NULL, av);
+	if (data->philos_nb < 1 || data->tte < 0 || data->tts < 0 
+		|| data->ttd < 0 || (av[5] && data->eat_counter < 0))
+	{
+		cleanup_resources(data, NULL);
+		return (1);
+	}
+	philo = create_philosophers(data);
+	final_supper(data, philo);
+	cleanup_resources(data, philo);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by abde-nnour        #+#    #+#             */
-/*   Updated: 2025/08/02 19:45:18 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 22:56:25 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,18 @@ void	consume_meal(t_philo *philo)
 {
 	long	eat_start_time;
 
+	if (should_terminate(philo))
+		return ;
 	eat_start_time = current_timestamp();
 	pthread_mutex_lock(&philo->locker);
+	pthread_mutex_lock(&philo->data->rip_mutex);
+	if (philo->data->rip)
+	{
+		pthread_mutex_unlock(&philo->data->rip_mutex);
+		pthread_mutex_unlock(&philo->locker);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->data->rip_mutex);
 	philo->last_meal = eat_start_time;
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->locker);
