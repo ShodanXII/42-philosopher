@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by abde-nnour        #+#    #+#             */
-/*   Updated: 2025/07/31 20:40:22 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 21:49:39 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,16 @@ void	announce_action(t_data *data, int philo_id, char *state)
 {
 	long	timestamp;
 
+	pthread_mutex_lock(&data->rip_mutex);
+	if (data->rip)
+	{
+		pthread_mutex_unlock(&data->rip_mutex);
+		return ;
+	}
+	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_mutex_lock(&data->print_mutex);
 	timestamp = current_timestamp() - data->start_timer;
-	if (!data->rip)
-		printf("%-4ld %-3d %s\n", timestamp, philo_id, state);
+	printf("%-4ld %-3d %s\n", timestamp, philo_id, state);
 	pthread_mutex_unlock(&data->print_mutex);
 }
 

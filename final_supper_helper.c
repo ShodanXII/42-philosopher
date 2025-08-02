@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 19:47:44 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 21:29:22 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/02 21:50:54 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 static void	initialize_philosopher(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->locker);
 	philo->last_meal = current_timestamp();
+	pthread_mutex_unlock(&philo->locker);
 	if (philo->id % 2 == 1)
 		rest_philosopher(philo);
 }
