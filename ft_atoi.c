@@ -35,6 +35,8 @@ int	ft_atoi(const char *str)
 		result += str[i] - 48;
 		i++;
 	}
+	if (str[i] && (str[i] == '-' || str[i] == '+'))
+		return (-1);
 	return (result);
 }
 
