@@ -14,6 +14,7 @@
 
 void	one_philo(t_philo *philo)
 {
+	philo->data->start_timer = current_timestamp();
 	if (pthread_create(&philo[0].thread, NULL, 
 			lonely_philosopher_routine, &philo[0]))
 		return ;

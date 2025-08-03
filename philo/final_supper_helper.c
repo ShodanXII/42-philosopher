@@ -77,9 +77,11 @@ int	detect_starvation(t_philo *philo, t_data *data)
 		pthread_mutex_lock(&data->rip_mutex);
 		if (!data->rip)
 		{
-			announce_action(data, philo->id, "died");
 			data->rip = 1;
 			pthread_mutex_unlock(&data->rip_mutex);
+			pthread_mutex_lock(&data->print_mutex);
+			printf("%-4ld %-3d died\n", current_timestamp() - data->start_timer, philo->id);
+			pthread_mutex_unlock(&data->print_mutex);
 			return (1);
 		}
 		pthread_mutex_unlock(&data->rip_mutex);

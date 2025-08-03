@@ -22,16 +22,17 @@ void	announce_action(t_data *data, int philo_id, char *state)
 {
 	long	timestamp;
 
+	pthread_mutex_lock(&data->print_mutex);
 	pthread_mutex_lock(&data->rip_mutex);
 	if (data->rip)
 	{
 		pthread_mutex_unlock(&data->rip_mutex);
+		pthread_mutex_unlock(&data->print_mutex);
 		return ;
 	}
-	pthread_mutex_unlock(&data->rip_mutex);
-	pthread_mutex_lock(&data->print_mutex);
 	timestamp = current_timestamp() - data->start_timer;
 	printf("%-4ld %-3d %s\n", timestamp, philo_id, state);
+	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_mutex_unlock(&data->print_mutex);
 }
 

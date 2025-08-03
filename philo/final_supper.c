@@ -52,7 +52,7 @@ static int	start_simulation(t_data *data, t_philo *philo, pthread_t *monitor)
 	if (data->philos_nb == 1)
 	{
 		one_philo(philo);
-		return (0);
+		return (-1);
 	}
 	data->start_timer = current_timestamp();
 	data->philos = philo;
@@ -73,22 +73,21 @@ static void	wait_and_cleanup(t_data *data, t_philo *philo, pthread_t monitor)
 {
 	int	i;
 
+	pthread_join(monitor, NULL);
 	i = 0;
 	while (i < data->philos_nb)
 	{
 		pthread_join(philo[i].thread, NULL);
 		i++;
 	}
-	pthread_mutex_lock(&data->rip_mutex);
-	data->rip = 1;
-	pthread_mutex_unlock(&data->rip_mutex);
-	pthread_join(monitor, NULL);
 }
 
 void	final_supper(t_data *data, t_philo *philo)
 {
 	pthread_t	monitor;
+	int			result;
 
-	if (start_simulation(data, philo, &monitor) == 0)
+	result = start_simulation(data, philo, &monitor);
+	if (result == 0)
 		wait_and_cleanup(data, philo, monitor);
 }

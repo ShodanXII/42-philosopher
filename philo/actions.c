@@ -14,9 +14,16 @@
 
 void	acquire_utensils(t_philo *philo)
 {
+	if (should_terminate(philo))
+		return ;
 	if (philo->data->philos_nb == 2 && philo->id == 2)
 		usleep(100);
 	pthread_mutex_lock(philo->l_forks);
+	if (should_terminate(philo))
+	{
+		pthread_mutex_unlock(philo->l_forks);
+		return ;
+	}
 	announce_action(philo->data, philo->id, "has taken a fork");
 	if (should_terminate(philo))
 	{
@@ -24,6 +31,12 @@ void	acquire_utensils(t_philo *philo)
 		return ;
 	}
 	pthread_mutex_lock(philo->r_forks);
+	if (should_terminate(philo))
+	{
+		pthread_mutex_unlock(philo->r_forks);
+		pthread_mutex_unlock(philo->l_forks);
+		return ;
+	}
 	announce_action(philo->data, philo->id, "has taken a fork");
 }
 
@@ -58,11 +71,15 @@ void	drop_utensils(t_philo *philo)
 
 void	rest_philosopher(t_philo *philo)
 {
+	if (should_terminate(philo))
+		return ;
 	announce_action(philo->data, philo->id, "is sleeping");
 	precise_sleep(philo->data->tts, philo->data);
 }
 
 void	contemplate(t_philo *philo)
 {
+	if (should_terminate(philo))
+		return ;
 	announce_action(philo->data, philo->id, "is thinking");
 }
