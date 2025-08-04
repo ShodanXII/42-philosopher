@@ -1,6 +1,6 @@
 NAME = philo
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror
 
 SRCS = philo.c init_data.c final_supper.c final_supper_helper.c \
        ft_atoi.c create_philosophers.c ft_isdigit.c clean.c \

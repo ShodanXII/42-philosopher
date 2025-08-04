@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 19:47:44 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 22:52:11 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/04 21:27:06 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,18 +62,17 @@ void	*philosopher_lifecycle(void *arg)
 int	detect_starvation(t_philo *philo, t_data *data)
 {
 	long	time_since_last_meal;
-	int		should_die;
 
-	should_die = 0;
-	time_since_last_meal = 0;
 	pthread_mutex_lock(&philo->locker);
 	time_since_last_meal = current_timestamp() - philo->last_meal;
-	if (time_since_last_meal >= data->ttd)
-		should_die = 1;
 	pthread_mutex_unlock(&philo->locker);
-
-	if (should_die)
+	if (time_since_last_meal < data->ttd)
+		return (0);
+	pthread_mutex_lock(&data->rip_mutex);
+	if (data->rip)
 	{
+<<<<<<< HEAD
+=======
 		pthread_mutex_lock(&data->rip_mutex);
 		if (!data->rip)
 		{
@@ -84,9 +83,17 @@ int	detect_starvation(t_philo *philo, t_data *data)
 			pthread_mutex_unlock(&data->print_mutex);
 			return (1);
 		}
+>>>>>>> 49004e742675c3f6174f746e55a7eb7ecabfb116
 		pthread_mutex_unlock(&data->rip_mutex);
+		return (0);
 	}
-	return (0);
+	data->rip = 1;
+	pthread_mutex_unlock(&data->rip_mutex);
+	pthread_mutex_lock(&data->print_mutex);
+	printf("%-4ld %-3d died\n", current_timestamp() - 
+		data->start_timer, philo->id);
+	pthread_mutex_unlock(&data->print_mutex);
+	return (1);
 }
 
 void	*observe_philosophers(void *arg)

@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:40:13 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 22:46:14 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/04 21:27:21 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,8 @@ void	distribute_utensils(t_philo *philo, t_data *data, int i)
 
 	left = i;
 	right = (i + 1) % data->philos_nb;
-	if (left < right)
-	{
-		philo->l_forks = &data->forks[left];
-		philo->r_forks = &data->forks[right];
-	}
-	else
-	{
-		philo->l_forks = &data->forks[right];
-		philo->r_forks = &data->forks[left];
-	}
+	philo->l_forks = &data->forks[right];
+	philo->r_forks = &data->forks[left];
 }
 
 void	process_parameters(t_data *data, char **av)
