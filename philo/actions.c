@@ -6,13 +6,13 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by abde-nnour        #+#    #+#             */
-/*   Updated: 2025/08/04 21:51:06 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:49 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	acquire_utensils(t_philo *philo)
+void	acquire_forks(t_philo *philo)
 {
 	if (should_terminate(philo))
 		return ;
@@ -46,7 +46,7 @@ void	consume_meal(t_philo *philo)
 
 	if (should_terminate(philo))
 		return ;
-	eat_start_time = current_timestamp();
+	eat_start_time = get_time();
 	pthread_mutex_lock(&philo->locker);
 	pthread_mutex_lock(&philo->data->rip_mutex);
 	if (philo->data->rip)
@@ -60,7 +60,7 @@ void	consume_meal(t_philo *philo)
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->locker);
 	announce_action(philo->data, philo->id, "is eating");
-	precise_sleep(philo->data->tte, philo->data);
+	ft_usleep(philo->data->tte, philo->data);
 }
 
 void	drop_utensils(t_philo *philo)
@@ -74,10 +74,10 @@ void	rest_philosopher(t_philo *philo)
 	if (should_terminate(philo))
 		return ;
 	announce_action(philo->data, philo->id, "is sleeping");
-	precise_sleep(philo->data->tts, philo->data);
+	ft_usleep(philo->data->tts, philo->data);
 }
 
-void	contemplate(t_philo *philo)
+void	thinkinge(t_philo *philo)
 {
 	if (should_terminate(philo))
 		return ;

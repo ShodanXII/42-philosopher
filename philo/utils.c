@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by abde-nnour        #+#    #+#             */
-/*   Updated: 2025/08/02 21:49:39 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:49 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,18 @@ void	announce_action(t_data *data, int philo_id, char *state)
 		pthread_mutex_unlock(&data->print_mutex);
 		return ;
 	}
-	timestamp = current_timestamp() - data->start_timer;
+	timestamp = get_time() - data->start_timer;
 	printf("%-4ld %-3d %s\n", timestamp, philo_id, state);
 	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_mutex_unlock(&data->print_mutex);
 }
 
-void	precise_sleep(long duration, t_data *data)
+void	ft_usleep(long duration, t_data *data)
 {
 	long	start;
 
-	start = current_timestamp();
-	while (current_timestamp() - start < duration)
+	start = get_time();
+	while (get_time() - start < duration)
 	{
 		usleep(100);
 		pthread_mutex_lock(&data->rip_mutex);

@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 19:47:44 by achat             #+#    #+#             */
-/*   Updated: 2025/08/04 21:27:06 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:27 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static void	initialize_philosopher(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->locker);
-	philo->last_meal = current_timestamp();
+	philo->last_meal = get_time();
 	pthread_mutex_unlock(&philo->locker);
 	if (philo->id % 2 == 1)
 		rest_philosopher(philo);
@@ -27,8 +27,8 @@ static void	*run_philosopher_simulation(t_philo *philo)
 	{
 		if (should_terminate(philo))
 			return (NULL);
-		contemplate(philo);
-		acquire_utensils(philo);
+		thinkinge(philo);
+		acquire_forks(philo);
 		consume_meal(philo);
 		pthread_mutex_lock(&philo->locker);
 		if (philo->data->eat_counter != -1
@@ -45,7 +45,7 @@ static void	*run_philosopher_simulation(t_philo *philo)
 			pthread_mutex_unlock(&philo->locker);
 		drop_utensils(philo);
 		rest_philosopher(philo);
-		contemplate(philo);
+		thinkinge(philo);
 	}
 	return (NULL);
 }
@@ -64,39 +64,26 @@ int	detect_starvation(t_philo *philo, t_data *data)
 	long	time_since_last_meal;
 
 	pthread_mutex_lock(&philo->locker);
-	time_since_last_meal = current_timestamp() - philo->last_meal;
+	time_since_last_meal = get_time() - philo->last_meal;
 	pthread_mutex_unlock(&philo->locker);
 	if (time_since_last_meal < data->ttd)
 		return (0);
 	pthread_mutex_lock(&data->rip_mutex);
 	if (data->rip)
 	{
-<<<<<<< HEAD
-=======
-		pthread_mutex_lock(&data->rip_mutex);
-		if (!data->rip)
-		{
-			data->rip = 1;
-			pthread_mutex_unlock(&data->rip_mutex);
-			pthread_mutex_lock(&data->print_mutex);
-			printf("%-4ld %-3d died\n", current_timestamp() - data->start_timer, philo->id);
-			pthread_mutex_unlock(&data->print_mutex);
-			return (1);
-		}
->>>>>>> 49004e742675c3f6174f746e55a7eb7ecabfb116
 		pthread_mutex_unlock(&data->rip_mutex);
 		return (0);
 	}
 	data->rip = 1;
 	pthread_mutex_unlock(&data->rip_mutex);
 	pthread_mutex_lock(&data->print_mutex);
-	printf("%-4ld %-3d died\n", current_timestamp() - 
+	printf("%-4ld %-3d died\n", get_time() - 
 		data->start_timer, philo->id);
 	pthread_mutex_unlock(&data->print_mutex);
 	return (1);
 }
 
-void	*observe_philosophers(void *arg)
+void	*monetor(void *arg)
 {
 	t_data	*data;
 	int		i;

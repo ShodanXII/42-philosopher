@@ -6,13 +6,13 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:40:13 by achat             #+#    #+#             */
-/*   Updated: 2025/08/04 21:27:21 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:27 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	current_timestamp(void)
+long	get_time(void)
 {
 	struct timeval	tv;
 
@@ -20,7 +20,7 @@ long	current_timestamp(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void	distribute_utensils(t_philo *philo, t_data *data, int i)
+void	set_forks(t_philo *philo, t_data *data, int i)
 {
 	int	left;
 	int	right;

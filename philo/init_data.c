@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 21:14:32 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 21:24:02 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:27 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ t_data	*init_data(t_data *data, char **av)
 	process_parameters(data, av);
 	data->rip = 0;
 	data->philos_full_count = 0;
-	data->start_timer = current_timestamp();
+	data->start_timer = get_time();
 	create_mutexes(data);
 	prepare_utensils(data);
 	return (data);

@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/02 19:53:59 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 19:55:23 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:27 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	one_philo(t_philo *philo)
 {
-	philo->data->start_timer = current_timestamp();
+	philo->data->start_timer = get_time();
 	if (pthread_create(&philo[0].thread, NULL, 
 			lonely_philosopher_routine, &philo[0]))
 		return ;

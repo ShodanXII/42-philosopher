@@ -6,7 +6,7 @@
 /*   By: achat <achat@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:39:55 by achat             #+#    #+#             */
-/*   Updated: 2025/08/02 22:29:02 by achat            ###   ########.fr       */
+/*   Updated: 2025/08/06 16:22:49 by achat            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	*lonely_philosopher_routine(void *arg)
 	philo = (t_philo *)arg;
 	announce_action(philo->data, philo->id, "is thinking");
 	announce_action(philo->data, philo->id, "has taken a fork");
-	precise_sleep(philo->data->ttd, philo->data);
+	ft_usleep(philo->data->ttd, philo->data);
 	announce_action(philo->data, philo->id, "died");
 	return (NULL);
 }
@@ -54,9 +54,9 @@ static int	start_simulation(t_data *data, t_philo *philo, pthread_t *monitor)
 		one_philo(philo);
 		return (-1);
 	}
-	data->start_timer = current_timestamp();
+	data->start_timer = get_time();
 	data->philos = philo;
-	if (pthread_create(monitor, NULL, observe_philosophers, data))
+	if (pthread_create(monitor, NULL, monetor, data))
 		return (1);
 	i = 0;
 	while (i < data->philos_nb)
